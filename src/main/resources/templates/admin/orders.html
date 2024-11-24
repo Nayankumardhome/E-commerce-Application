@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base :: layout(~{::section})}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Insert title here</title>
+
+</head>
+<body>
+
+	<section>
+		<div class="container-fluid p-2 mt-3">
+			<h3 class="text-center">ALL Orders</h3>
+			<th:block th:if="${session.successMsg}">
+				<p class="text-success text-center fw-bold">[[${session.successMsg}]]</p>
+				<th:block th:text="${@commanServiceImpl.removeSessionMsg}"></th:block>
+			</th:block>
+			<th:block th:if="${session.errorMsg}">
+				<p class="text-danger text-center fw-bold">[[${session.errorMsg}]]</p>
+				<th:block th:text="${@commanServiceImpl.removeSessionMsg}"></th:block>
+			</th:block>
+			<hr>
+			<!-- <a th:href="@{'/admin/'}"
+				class="btn btn-outline-dark btn-sm thicker-outline d-inline-block mb-2"
+				style="width: auto;"> <img alt=""
+				th:src="@{/img/back-to-home.png}" width="25px" height="25px">
+				Home
+			</a> -->
+			<div class="row" style="font-size: 14px;">
+				<form th:action="@{/admin/filterMyOrders}" method="get"
+					class="col-md-2">
+					<aside class="sticky-top">
+						<div class="card mb-4">
+							<h4 class="card-header bg-primary text-white">Filters</h4>
+							<div class="card-body">
+								<!-- Order Status Filter -->
+								<div class="mb-4">
+									<h5 class="card-title">Order Status</h5>
+									<div class="form-group" th:each="status : ${orderStatuses}">
+										<div class="custom-control custom-checkbox">
+											<input type="checkbox"
+												class="custom-control-input filter-checkbox"
+												th:id="'status_' + ${status}" th:value="${status}"
+												name="status"
+												th:checked="${selectedStatus != null and selectedStatus.contains(status)}" />
+											<label class="custom-control-label"
+												th:for="'status_' + ${status}"> <span
+												th:text="${status}"></span>
+											</label>
+										</div>
+									</div>
+								</div>
+
+								<!-- Order Time Filter -->
+								<div class="mb-4">
+									<h5 class="card-title">Order Time</h5>
+									<div class="form-group" th:each="timeFilter : ${timeFilters}">
+										<div class="custom-control custom-checkbox">
+											<input type="checkbox"
+												class="custom-control-input filter-checkbox"
+												th:id="'time' + ${timeFilter}" th:value="${timeFilter}"
+												name="time"
+												th:checked="${selectedTime != null and selectedTime.contains(timeFilter)}" />
+											<label class="custom-control-label"
+												th:for="'time' + ${timeFilter}"> <span
+												th:text="${timeFilter}"></span>
+											</label>
+										</div>
+									</div>
+								</div>
+
+								<button class="btn btn-primary w-100">Apply Filters</button>
+							</div>
+						</div>
+					</aside>
+				</form>
+
+				<main class="col-md-10">
+					<form th:action="@{/admin/searchMyOrders}" method="get"
+						class="mb-3">
+						<div class="row">
+							<div class="col-10">
+								<input type="number" id="productOrderId" name="productOrderId"
+									class="form-control"
+									placeholder="Search orders by Order id from here" required>
+							</div>
+							<div class="col-2">
+								<button type="submit" id="searchButton" class="btn btn-primary">Search
+									Orders</button>
+							</div>
+						</div>
+					</form>
+
+					<div class="card-body">
+						<div class="empty-block-bg" th:if="${orders.isEmpty()}"
+							style="text-align: center; padding: 50px;">
+							<img th:src="@{/img/no-order.png}" width="150px" height="130px"
+								alt="Empty Cart Image">
+							<div class="blockquote" style="margin-top: 20px;">Sorry, no
+								results found</div>
+							<div>Edit search or go back to All Orders Page.</div>
+							<div class="text-center mt-2">
+								<a href="/admin/orders" class="btn btn-primary">Go to All
+									Orders</a>
+							</div>
+						</div>
+						<div th:if="${!orders.isEmpty()}">
+							<div style="overflow-x: auto; min-width: 900px;">
+								<table class="table table-bordered">
+									<thead>
+										<tr class="text-center">
+											<!-- Sticky columns -->
+											<th class="col-2" scope="col"
+												style="position: sticky; left: 0; background-color: white; z-index: 1;">Order
+												Id</th>
+											<th class="col-3" scope="col">Delivery Details</th>
+											<th class="col-1" scope="col">Date</th>
+											<th class="col-1" scope="col">Product Details</th>
+											<th class="col-2" scope="col">Price</th>
+											<!-- Sticky column -->
+											<th class="col-2" scope="col"
+												style="position: sticky; left: 150px; background-color: white; z-index: 1; width: 120px;">Status</th>
+											<!-- Sticky column -->
+											<th class="col-2" scope="col"
+												style="position: sticky; left: 300px; background-color: white; z-index: 1; width: 150px;">Action</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="order, c:${orders}">
+											<!-- Sticky column -->
+											<th scope="row">[[${order.productOrderId}]]</th>
+											<td>Name:
+												[[${order.orderSummary.deliveryAddress.firstName + ' ' +
+												order.orderSummary.deliveryAddress.lastName}]] <br>
+												Email: [[${order.orderSummary.deliveryAddress.email}]] <br>
+												Mobile Number:
+												[[${order.orderSummary.deliveryAddress.mobileNumber}]] <br>
+												Address: [[${order.orderSummary.deliveryAddress.address}]] <br>
+												City: [[${order.orderSummary.deliveryAddress.city}]] <br>
+												State: [[${order.orderSummary.deliveryAddress.state}]],
+												[[${order.orderSummary.deliveryAddress.pincode}]]
+											</td>
+											<td>[[${order.orderSummary.orderDate}]]</td>
+											<td>[[${order.product.productName}]]</td>
+											<td>Quantity: [[${order.quantity}]] <br> Price:
+												[[${order.price}]] <br> Total Price: ₹
+												[[${#numbers.formatDecimal(order.quantity * order.price, 2,
+												2)}]]
+											</td>
+											<td><span
+												th:if="${order.status.finalStatus == 'Delivered'}"> <i
+													class="fa fa-circle"
+													style="color: green; font-size: 0.75rem;"></i>
+													[[${order.status.status}]] <br> Delivered Date:
+													[[${order.deliveredDate}]]
+											</span> <span th:if="${order.status.finalStatus == 'Canceled'}">
+													<i class="fa fa-circle"
+													style="color: red; font-size: 0.75rem;"></i>
+													[[${order.status.status}]] <br> Canceled Date:
+													[[${order.cancleDate}]]
+											</span> <span th:if="${order.status.finalStatus == 'Returned'}">
+													<i class="fa fa-circle"
+													style="color: red; font-size: 0.75rem;"></i>
+													[[${order.status.status}]] <br> Returned Date:
+													[[${order.returnDate}]]
+											</span> <span th:if="${order.status.finalStatus == 'Replaced'}">
+													<i class="fa fa-circle"
+													style="color: green; font-size: 0.75rem;"></i>
+													[[${order.status.status}]] <br> Replaced Date:
+													[[${order.replacedDate}]]
+											</span> <span th:if="${order.status.finalStatus == 'On the way'}">
+													<i class="fa fa-circle"
+													style="color: #068DF6; font-size: 0.75rem;"></i>
+													[[${order.status.status}]]
+											</span> <!-- Other status conditions here --></td>
+											<!-- Sticky column -->
+											<td>
+												<form action="/admin/update-order-status" method="post">
+													<div class="row">
+														<div class="col">
+															<select class="form-control" name="statusId">
+																<option>Select</option>
+																<option value="1">In Progress</option>
+																<option value="2">Order Received</option>
+																<option value="3">Product Packed</option>
+																<option value="4">Out For Delivery</option>
+																<option value="5">Delivered</option>
+																<option value="6">Canceled</option>
+																<option value="7">Returned In Progress</option>
+																<option value="8">Returned Out For Receiving</option>
+																<option value="9">Returned Received</option>
+																<option value="10">Returned</option>
+																<option value="11">Replaced In Progress</option>
+																<option value="12">Replaced Out For Receiving</option>
+																<option value="13">Replaced Received</option>
+																<option value="14">Replaced Order Received</option>
+																<option value="15">Replaced Product Packed</option>
+																<option value="16">Replaced Out For Delivery</option>
+																<option value="17">Replaced</option>
+															</select>
+														</div>
+														<input th:value="${order.id}" name="id" type="hidden">
+														<div class="col">
+															<th:block
+																th:if="${order.status.finalStatus == 'Canceled' || order.status.finalStatus == 'Delivered' || order.status.finalStatus == 'Returned' || order.status.finalStatus == 'Replaced'}">
+																<button class="btn btn-primary btn-sm col disabled">Update</button>
+															</th:block>
+															<th:block
+																th:unless="${order.status.finalStatus == 'Canceled' || order.status.finalStatus == 'Delivered' || order.status.finalStatus == 'Returned' || order.status.finalStatus == 'Replaced'}">
+																<button class="btn btn-sm btn-primary">Update</button>
+															</th:block>
+														</div>
+													</div>
+												</form>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+								<!-- pagination -->
+								<div class="row">
+									<div class="col-md-4">Total Orders: [[${totalElements}]]</div>
+									<div class="col-md-6">
+
+										<!-- When filters are applied -->
+										<th:block
+											th:if="${ordersSize > 0 and ((selectedStatus != null and !selectedStatus.isEmpty()) or (selectedTime != null and !selectedTime.isEmpty()))}">
+											<nav aria-label="Page navigation example">
+												<ul class="pagination">
+													<li class="page-item"><a class="page-link"
+														th:classappend="${isFirst} ? 'disabled' : ''"
+														th:href="@{/admin/filterMyOrders(time=${selectedTime}, status=${selectedStatus}, pageNo=${pageNo - 1})}"
+														aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
+													</a></li>
+
+													<li th:each="i : ${#numbers.sequence(1, totalPages)}"
+														class="page-item"
+														th:classappend="${pageNo + 1 == i} ? 'active' : ''"><a
+														class="page-link"
+														th:href="@{/admin/filterMyOrders(time=${selectedTime}, status=${selectedStatus}, pageNo=${i - 1})}">
+															[[${i}]] </a></li>
+
+													<li class="page-item"><a class="page-link"
+														th:classappend="${isLast} ? 'disabled' : ''"
+														th:href="@{/admin/filterMyOrders(time=${selectedTime}, status=${selectedStatus}, pageNo=${pageNo + 1})}"
+														aria-label="Next"> <span aria-hidden="true">&raquo;</span>
+													</a></li>
+												</ul>
+											</nav>
+										</th:block>
+
+										<!-- When filters are NOT applied -->
+										<th:block
+											th:unless="${ordersSize > 0 and ((selectedStatus != null and !selectedStatus.isEmpty()) or (selectedTime != null and !selectedTime.isEmpty()))}">
+											<nav aria-label="Page navigation example">
+												<ul class="pagination">
+													<li class="page-item"><a class="page-link"
+														th:classappend="${isFirst}?'disabled':''"
+														th:href="@{'/admin/orders?pageNo=' + ${pageNo-1}}"
+														aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
+													</a></li>
+													<li th:each="i:${#numbers.sequence(1,totalPages)}"
+														class="page-item"
+														th:classappend="${pageNo+1==i}?'active':''"><a
+														class="page-link"
+														th:href="@{'/admin/orders?pageNo=' + ${i-1}}">[[${i}]]</a>
+													</li>
+
+													<li class="page-item"><a class="page-link"
+														th:classappend="${isLast}?'disabled':''"
+														th:href="@{'/admin/orders?pageNo=' + ${pageNo+1}}"
+														aria-label="Next"> <span aria-hidden="true">&raquo;</span>
+													</a></li>
+												</ul>
+											</nav>
+										</th:block>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</main>
+			</div>
+		</div>
+	</section>
+
+</body>
+</html>

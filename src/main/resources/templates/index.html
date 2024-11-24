@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base :: layout(~{::section})}">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+	<section>
+
+		<!-- Slider Start -->
+
+		<div id="carouselExampleCaptions" class="carousel slide">
+			<div class="carousel-indicators">
+				<button type="button" data-bs-target="#carouselExampleCaptions"
+					data-bs-slide-to="0" class="active" aria-current="true"
+					aria-label="Slide 1"></button>
+				<button type="button" data-bs-target="#carouselExampleCaptions"
+					data-bs-slide-to="1" aria-label="Slide 2"></button>
+				<button type="button" data-bs-target="#carouselExampleCaptions"
+					data-bs-slide-to="2" aria-label="Slide 3"></button>
+				<button type="button" data-bs-target="#carouselExampleCaptions"
+					data-bs-slide-to="3" aria-label="Slide 0"></button>
+			</div>
+			<div class="carousel-inner">
+				<div class="carousel-item active">
+					<img src="img/carousel1.jpg" class="d-block w-100" alt="..."
+						height="500px">
+					<div class="carousel-caption d-none d-md-block">
+						<h5>Sale Sale Sale!!!!</h5>
+						<p>Hurry Fast.....</p>
+					</div>
+				</div>
+				<div class="carousel-item">
+					<img src="img/carousel2.jpg" class="d-block w-100" alt="..."
+						height="500px">
+					<div class="carousel-caption d-none d-md-block">
+						<h5>Sale Sale!!</h5>
+						<p>Save Money...</p>
+					</div>
+				</div>
+				<div class="carousel-item">
+					<img src="img/Carousel3.jpg" class="d-block w-100" alt="..."
+						height="500px">
+					<div class="carousel-caption d-none d-md-block">
+						<h5>50% of On Shoes..</h5>
+						<p>Sale on Shoes Category.</p>
+					</div>
+				</div>
+				<div class="carousel-item">
+					<img src="img/Carousel4.jpg" class="d-block w-100" alt="..."
+						height="500px">
+					<div class="carousel-caption d-none d-md-block">
+						<h5>20% of On Headset..</h5>
+						<p>Sale on EarWarables Category.</p>
+					</div>
+				</div>
+			</div>
+			<button class="carousel-control-prev" type="button"
+				data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+				<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+				<span class="visually-hidden">Previous</span>
+			</button>
+			<button class="carousel-control-next" type="button"
+				data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+				<span class="carousel-control-next-icon" aria-hidden="true"></span>
+				<span class="visually-hidden">Next</span>
+			</button>
+		</div>
+
+		<!-- Slider End -->
+
+		<!-- Start Category Module -->
+
+		<div class="container">
+			<div class="row">
+				<p class="text-center fs-4">Category</p>
+				<div class="col-md-2" th:each="category:${categories}">
+					<div
+						class="card rounded-circle shadow-sm p-3 mb-5 bg-body-tertiary rounded">
+						<div class="card-body text-center">
+							<img alt="" th:src="@{'img/category_img/' + ${category.image}}"
+								width="100%" height="95px"><br> <a
+								th:href="@{'/products?category='+${category.name}}"
+								class="text-decoration-none">[[${category.name}]]</a>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<!-- End Category Module-->
+		<div class="divider p-3 mb-2 bg-body-secondary">
+			<hr class="my-4">
+		</div>
+
+		<!-- Start Latest Product Module -->
+		<div class="container-fluid bg-light p-3">
+			<div class="row">
+				<p class="text-center fs-4">Latest Product</p>
+
+				<div class="col-md-3 mb-4" th:each="product:${products}">
+					<div class="card">
+						<div class="card-body text-center">
+							<img class="mb-2" alt="HP Laptop"
+								th:src="@{'img/product_img/' + ${product.image}}" width="65%"
+								height="140px"><br> <a
+								th:href="@{'/product/'+${product.id}}"
+								class="text-decoration-none">[[${product.productName}]]</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- End Latest Product Module -->
+
+
+	</section>
+
+
+</body>
+</html>

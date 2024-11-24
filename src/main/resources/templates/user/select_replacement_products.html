@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base :: layout(~{::section})}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Insert title here</title>
+
+</head>
+<body>
+
+	<section>
+		<div class="card shadow-sm p-3 mb-5 bg-body-tertiary rounded">
+			<div class="card-body">
+				<div class="card-header mb-3">
+					<p class="fs-3 text-center">Select a Replacement Product</p>
+				</div>
+				<form th:action="@{'/user/replaceProductSelect'}" method="post">
+					<input type="hidden" name="orderId" th:value="${orderId}" />
+
+					<!-- Container for Product Cards -->
+					<div class="row justify-content-center">
+						<!-- Product Card Loop -->
+						<div class="col-md-3 mb-4 d-flex justify-content-center"
+							th:each="product : ${replacementProducts}">
+							<div class="card product-card shadow-sm border-0 h-100"
+								style="width: 100%;">
+								<div class="img-container"
+									style="height: 180px; overflow: hidden;">
+									<img alt="" th:src="@{'/img/product_img/' + ${product.image}}"
+										class="card-img-top"
+										style="width: 100%; height: 100%; object-fit: contain;">
+								</div>
+								<div class="card-body text-center p-3">
+									<h6 class="card-title fw-bold mb-1"
+										th:text="${product.productName}"></h6>
+									<p class="card-text text-muted small">
+										<strong>Category:</strong> <span th:text="${product.category}"></span>
+									</p>
+									<div class="row text-center mb-2">
+										<p class="fw-bold text-primary fs-6">
+											&#8377; <span th:text="${product.discountPrice}"></span>
+										</p>
+										<p class="text-muted small">
+											<span class="text-decoration-line-through">&#8377; <span
+												th:text="${product.price}"></span></span> <span
+												class="text-success">(<span
+												th:text="${product.discount}"></span>% OFF)
+											</span>
+										</p>
+									</div>
+
+									<!-- Description Container -->
+									<div class="description-container"
+										style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease;">
+										<p class="description small" th:text="${product.description}"
+											style="overflow-y: auto; max-height: 150px;"></p>
+									</div>
+
+									<!-- View More Link -->
+									<a class="view-more text-primary small" href="#"
+										onclick="toggleDescription(this); return false;">View More</a>
+
+									<div class="form-check d-flex justify-content-center mt-3">
+										<input class="form-check-input" type="radio"
+											name="replacementProductId" th:value="${product.id}" required>
+										<label class="form-check-label ms-2 small"
+											for="replacementProductId">Select this product</label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Pagination and Submit Button (unchanged) -->
+					<div class="row">
+						<div class="col-md-4">Total Products: [[${totalElements}]] :: Page Number: [[${pageNo}]] :: isFirst: [[${isFirst}]]</div>
+						<div class="col-md-6">
+							<th:block th:if="${replacementProductsSize > 0}">
+								<nav aria-label="Page navigation example">
+									<ul class="pagination">
+										<li class="page-item">
+											<form th:action="@{/user/replaceOrderProducts}" method="post">
+												<input type="hidden" name="orderId" th:value="${orderId}" />
+												<input type="hidden" name="pageNo" th:value="${pageNo - 1}" />
+												<button class="page-link"
+													th:classappend="${isFirst} ? 'disabled' : ''" type="submit"
+													aria-label="Previous">
+													<span aria-hidden="true">&laquo;</span>
+												</button>
+											</form>
+										</li>
+
+										<li th:each="i : ${#numbers.sequence(1, totalPages)}"
+											class="page-item"
+											th:classappend="${pageNo + 1 == i} ? 'active' : ''">
+											<form th:action="@{/user/replaceOrderProducts}" method="post">
+												<input type="hidden" name="orderId" th:value="${orderId}" />
+												<input type="hidden" name="pageNo" th:value="${i - 1}" />
+												<button class="page-link"
+													th:classappend="${pageNo + 1 == i} ? 'active' : ''"
+													type="submit">[[${i}]]</button>
+											</form>
+										</li>
+
+										<li class="page-item">
+											<form th:action="@{/user/replaceOrderProducts}" method="post">
+												<input type="hidden" name="orderId" th:value="${orderId}" />
+												<input type="hidden" name="pageNo" th:value="${pageNo + 1}" />
+												<button class="page-link"
+													th:classappend="${isLast} ? 'disabled' : ''" type="submit"
+													aria-label="Next">
+													<span aria-hidden="true">&raquo;</span>
+												</button>
+											</form>
+										</li>
+									</ul>
+
+								</nav>
+							</th:block>
+						</div>
+					</div>
+
+					<div class="text-center mt-4">
+						<button type="submit" class="btn btn-lg btn-success px-4 py-2">Confirm
+							Replacement</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<!-- JavaScript Function for Toggling Description -->
+		<script>
+			function toggleDescription(link) {
+				const descriptionContainer = link.previousElementSibling;
+				if (descriptionContainer.style.maxHeight === '0px'
+						|| descriptionContainer.style.maxHeight === '') {
+					descriptionContainer.style.maxHeight = descriptionContainer.scrollHeight
+							+ 'px';
+					link.textContent = 'View Less';
+				} else {
+					descriptionContainer.style.maxHeight = '0px';
+					link.textContent = 'View More';
+				}
+			}
+		</script>
+
+	</section>
+
+</body>
+</html>

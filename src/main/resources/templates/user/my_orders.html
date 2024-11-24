@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base :: layout(~{::section})}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Insert title here</title>
+
+</head>
+<body>
+
+	<section>
+		<div class="container-fluid p-5 mt-3">
+			<div class="row">
+				<form th:action="@{/user/filterMyOrders}" method="get"
+					class="col-md-3">
+					<aside class="sticky-top">
+						<div class="card mb-4">
+							<h4 class="card-header bg-primary text-white">Filters</h4>
+							<div class="card-body">
+								<!-- Order Status Filter -->
+								<div class="mb-4">
+									<h5 class="card-title">Order Status</h5>
+									<div class="form-group" th:each="status : ${orderStatuses}">
+										<div class="custom-control custom-checkbox">
+											<input type="checkbox"
+												class="custom-control-input filter-checkbox"
+												th:id="'status_' + ${status}" th:value="${status}"
+												name="status"
+												th:checked="${selectedStatus != null and selectedStatus.contains(status)}" />
+											<label class="custom-control-label"
+												th:for="'status_' + ${status}"> <span
+												th:text="${status}"></span>
+											</label>
+										</div>
+									</div>
+								</div>
+
+								<!-- Order Time Filter -->
+								<div class="mb-4">
+									<h5 class="card-title">Order Time</h5>
+									<div class="form-group" th:each="timeFilter : ${timeFilters}">
+										<div class="custom-control custom-checkbox">
+											<input type="checkbox"
+												class="custom-control-input filter-checkbox"
+												th:id="'time' + ${timeFilter}" th:value="${timeFilter}"
+												name="time"
+												th:checked="${selectedTime != null and selectedTime.contains(timeFilter)}" />
+											<label class="custom-control-label"
+												th:for="'time' + ${timeFilter}"> <span
+												th:text="${timeFilter}"></span>
+											</label>
+										</div>
+									</div>
+								</div>
+
+								<button class="btn btn-primary w-100">Apply Filters</button>
+							</div>
+						</div>
+					</aside>
+				</form>
+
+				<main class="col-md-9">
+					<form th:action="@{/user/searchMyOrders}" method="get" class="mb-3">
+						<div class="row">
+							<div class="col-10">
+								<input type="text" id="searchQuery" name="searchQuery"
+									class="form-control" placeholder="Search your orders here"
+									required oninput="toggleSearchButton()">
+							</div>
+							<div class="col-2">
+								<button type="submit" id="searchButton" class="btn btn-primary"
+									disabled>Search Orders</button>
+							</div>
+						</div>
+					</form>
+
+					<div class="card-body">
+						<div class="empty-block-bg" th:if="${orders.isEmpty()}"
+							style="text-align: center; padding: 50px;">
+							<img th:src="@{/img/no-order.png}" width="150px" height="130px"
+								alt="Empty Cart Image">
+							<div class="blockquote" style="margin-top: 20px;">Sorry, no
+								results found</div>
+							<div>Edit search or go back to My Orders Page.</div>
+							<div class="text-center mt-2">
+								<a href="/user/user-orders" class="btn btn-primary">Go to My
+									Orders</a>
+							</div>
+						</div>
+						<div th:if="${!orders.isEmpty()}">
+							<table class="table">
+								<thead>
+									<tr class="text-center">
+										<th scope="col">S.No</th>
+										<th scope="col">Image</th>
+										<th scope="col">Product Name</th>
+										<th scope="col">Quantity</th>
+										<th scope="col">Total Price</th>
+										<th scope="col">Order Status</th>
+										<th scope="col">Action</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr class="text-center" th:each="order, c:${orders}"
+										onclick="window.location.href='#'" style="cursor: pointer;">
+										<th scope="row">[[${c.count}]]</th>
+										<td><img
+											th:src="@{'/img/product_img/' + ${order.product.image}}"
+											width="100px" height="90px"
+											onerror="this.src='/img/product_img/default.png'"
+											alt="Product Image"></td>
+										<td>[[${order.product.productName}]]</td>
+										<td>[[${order.quantity}]]</td>
+										<td>₹ [[${#numbers.formatDecimal(order.price -
+											order.quantity, 2, 2)}]]</td>
+										<td><span
+											th:if="${order.status.finalStatus == 'Delivered'}"> <i
+												class="fa fa-circle"
+												style="color: green; font-size: 0.75rem;"></i>
+												[[${order.status.status}]]<br> Delivered Date:
+												[[${order.deliveredDate}]]
+										</span> <span th:if="${order.status.finalStatus == 'Canceled'}">
+												<i class="fa fa-circle"
+												style="color: red; font-size: 0.75rem;"></i>
+												[[${order.status.status}]] <br> Canceled Date:
+												[[${order.cancleDate}]]
+										</span> <span th:if="${order.status.finalStatus == 'Returned'}">
+												<i class="fa fa-circle"
+												style="color: red; font-size: 0.75rem;"></i>
+												[[${order.status.status}]] <br> Returned Date:
+												[[${order.returnDate}]]
+										</span> <span th:if="${order.status.finalStatus == 'Replaced'}">
+												<i class="fa fa-circle"
+												style="color: green; font-size: 0.75rem;"></i>
+												[[${order.status.status}]] <br> Replaced Date:
+												[[${order.replacedDate}]]
+										</span> <span th:if="${order.status.finalStatus == 'On the way'}">
+												<i class="fa fa-circle"
+												style="color: #068DF6; font-size: 0.75rem;"></i>
+												[[${order.status.status}]]
+										</span></td>
+										<td>
+											<!-- Replace Button -->
+											<div class="row mb-1">
+												<div class="col">
+													<a
+														th:href="@{'/user/updateOrderStatus?id=' + ${order.id} + '&status=replace'}"
+														class="btn btn-outline-dark btn-sm w-100 thicker-outline"
+														th:classappend="${(order.orderSummary != null and order.status.finalStatus == 'Delivered') and (order.orderSummary.orderDate != null and order.orderSummary.orderDate >= T(java.time.LocalDate).now().minusDays(7)) ? '' : 'disabled'}"
+														th:disabled="${order.status.finalStatus == 'Canceled' || order.status.finalStatus == 'Returned' || (order.status.finalStatus == 'Replaced' && order.replacedDate != null && order.replacedDate.plusDays(3).isBefore(T(java.time.LocalDate).now())) || (order.status.finalStatus == 'Delivered' && order.orderSummary.orderDate != null && order.orderSummary.orderDate.plusDays(7).isBefore(T(java.time.LocalDate).now()))}">
+														<img alt="" th:src="@{/img/replaced.png}" width="25px"
+														height="25px"> Replace
+													</a>
+												</div>
+											</div> <!-- Return Button -->
+											<div class="row mb-1">
+												<div class="col">
+													<a
+														th:href="@{'/user/updateOrderStatus?id=' + ${order.id} + '&status=return'}"
+														class="btn btn-outline-dark btn-sm w-100 thicker-outline"
+														th:classappend="${(order.orderSummary != null and order.status.finalStatus == 'Delivered') and (order.orderSummary.orderDate != null and order.orderSummary.orderDate >= T(java.time.LocalDate).now().minusDays(7)) ? '' : 'disabled'}"
+														th:disabled="${order.status.finalStatus == 'Canceled' || order.status.finalStatus == 'Returned' || (order.status.finalStatus == 'Replaced' and order.orderSummary.orderDate != null and order.orderSummary.orderDate.plusDays(3).isBefore(T(java.time.LocalDate).now())) || (order.status.finalStatus == 'Delivered' and order.orderSummary.orderDate != null and order.orderSummary.orderDate.plusDays(7).isBefore(T(java.time.LocalDate).now()))}">
+														<img alt="Order Return" th:src="@{/img/return.png}"
+														width="25px" height="25px"> Return
+													</a>
+												</div>
+											</div> <!-- Cancel Button -->
+											<div class="row mb-1">
+												<div class="col">
+													<a
+														th:href="@{'/user/updateOrderStatus?id=' + ${order.id} + '&status=cancel'}"
+														class="btn btn-outline-dark btn-sm w-100 thicker-outline"
+														th:classappend="${order.orderSummary != null and order.status.finalStatus == 'On the way' ? '' : 'disabled'}"
+														th:disabled="${order.status.finalStatus == 'Canceled' || order.status.finalStatus == 'Returned' || (order.orderSummary == null or order.status.finalStatus != 'On the way')}">
+														<img alt="" th:src="@{/img/cancel-order.png}" width="25px"
+														height="25px"> Cancel
+													</a>
+												</div>
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+							<!-- pagination -->
+							<div class="row">
+								<div class="col-md-4">Total Orders: [[${totalElements}]]</div>
+								<div class="col-md-6">
+									<!-- When filters are applied -->
+									<th:block
+										th:if="${ordersSize > 0 and ((selectedStatus != null and !selectedStatus.isEmpty()) or (selectedTime != null and !selectedTime.isEmpty())) and (searchQuery == null or searchQuery.isEmpty())}">
+										<nav aria-label="Page navigation example">
+											<ul class="pagination">
+												<li class="page-item"><a class="page-link"
+													th:classappend="${isFirst} ? 'disabled' : ''"
+													th:href="@{/user/filterMyOrders(time=${selectedTime}, status=${selectedStatus}, pageNo=${pageNo - 1})}"
+													aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
+												</a></li>
+												<li th:each="i : ${#numbers.sequence(1, totalPages)}"
+													class="page-item"
+													th:classappend="${pageNo + 1 == i} ? 'active' : ''"><a
+													class="page-link"
+													th:href="@{/user/filterMyOrders(time=${selectedTime}, status=${selectedStatus}, pageNo=${i - 1})}">
+														[[${i}]] </a></li>
+												<li class="page-item"><a class="page-link"
+													th:classappend="${isLast} ? 'disabled' : ''"
+													th:href="@{/user/filterMyOrders(time=${selectedTime}, status=${selectedStatus}, pageNo=${pageNo + 1})}"
+													aria-label="Next"> <span aria-hidden="true">&raquo;</span>
+												</a></li>
+											</ul>
+										</nav>
+									</th:block>
+
+									<!-- When filters are NOT applied -->
+									<th:block
+										th:if="${ordersSize > 0 and ((selectedStatus == null or selectedStatus.isEmpty()) and (selectedTime == null or selectedTime.isEmpty())) and (searchQuery == null or searchQuery.isEmpty())}">
+										<nav aria-label="Page navigation example">
+											<ul class="pagination">
+												<li class="page-item"><a class="page-link"
+													th:classappend="${isFirst}?'disabled':''"
+													th:href="@{'/user/user-orders?pageNo=' + ${pageNo-1}}"
+													aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
+												</a></li>
+												<li th:each="i:${#numbers.sequence(1,totalPages)}"
+													class="page-item"
+													th:classappend="${pageNo+1==i}?'active':''"><a
+													class="page-link"
+													th:href="@{'/user/user-orders?pageNo=' + ${i-1}}">[[${i}]]</a>
+												</li>
+
+												<li class="page-item"><a class="page-link"
+													th:classappend="${isLast}?'disabled':''"
+													th:href="@{'/user/user-orders?pageNo=' + ${pageNo+1}}"
+													aria-label="Next"> <span aria-hidden="true">&raquo;</span>
+												</a></li>
+											</ul>
+										</nav>
+									</th:block>
+
+
+									<!-- When Search Query is applied -->
+									<th:block
+										th:if="${ordersSize > 0 and (searchQuery != null and !searchQuery.isEmpty())}">
+										<nav aria-label="Page navigation example">
+											<ul class="pagination">
+												<li class="page-item"><a class="page-link"
+													th:classappend="${isFirst} ? 'disabled' : ''"
+													th:href="@{'/user/searchMyOrders'(searchQuery=${searchQuery}, pageNo=${pageNo - 1})}"
+													aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
+												</a></li>
+												<li th:each="i : ${#numbers.sequence(1, totalPages)}"
+													class="page-item"
+													th:classappend="${pageNo + 1 == i} ? 'active' : ''"><a
+													class="page-link"
+													th:href="@{'/user/searchMyOrders'(searchQuery=${searchQuery}, pageNo=${i - 1})}">
+														[[${i}]] </a></li>
+												<li class="page-item"><a class="page-link"
+													th:classappend="${isLast} ? 'disabled' : ''"
+													th:href="@{'/user/searchMyOrders'(searchQuery=${searchQuery}, pageNo=${pageNo + 1})}"
+													aria-label="Next"> <span aria-hidden="true">&raquo;</span>
+												</a></li>
+											</ul>
+										</nav>
+									</th:block>
+
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</main>
+			</div>
+		</div>
+
+		<script>
+			function toggleSearchButton() {
+				const searchInput = document.getElementById('searchQuery');
+				const searchButton = document.getElementById('searchButton');
+
+				searchButton.disabled = !searchInput.value.trim();
+			}
+		</script>
+	</section>
+
+</body>
+</html>

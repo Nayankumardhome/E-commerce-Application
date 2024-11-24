@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base :: layout(~{::section})}">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+	<section>
+		<div class="container-fluid p-5 mt-3">
+			<div class="row"></div>
+
+			<div class="col-md-12">
+				<div class="card card-sh">
+					<div class="card-header text-center">
+						<p class="fs-4">All Products</p>
+						<th:block th:if="${session.successMsg}">
+							<p class="text-success fw-bold">[[${session.successMsg}]]</p>
+							<th:block th:text="${@commanServiceImpl.removeSessionMsg}"></th:block>
+						</th:block>
+						<th:block th:if="${session.errorMsg}">
+							<p class="text-danger fw-bold">[[${session.errorMsg}]]</p>
+							<th:block th:text="${@commanServiceImpl.removeSessionMsg}"></th:block>
+						</th:block>
+					</div>
+					<!-- Search Bar -->
+					<form th:action="@{/admin/searchProduct}" method="get"
+						class="d-flex justify-content-center mt-3">
+						<input type="text" name="query" class="form-control w-50"
+							placeholder="Search by Product Name or Category" required>
+						<button type="submit" class="btn btn-primary ms-2">Search</button>
+					</form>
+					<div class="card-body">
+						<table class="table">
+							<thead>
+								<tr class="text-center">
+									<th scope="col">S.No</th>
+									<th scope="col">Image</th>
+									<th scope="col">Product Name</th>
+									<th scope="col">Category</th>
+									<th scope="col">Price</th>
+									<th scope="col">Discount</th>
+									<th scope="col">Discount Price</th>
+									<th scope="col">Stock</th>
+									<th scope="col">Action</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr class="text-center" th:each="product,c:${products}">
+									<th scope="row">[[${c.count}]]</th>
+									<td><img th:src="@{'/img/product_img/'+${product.image}}"
+										width="100px" height="90px"
+										onerror="this.src='/img/product_img/default.png'"></td>
+									<td class="col-md-2">[[${product.productName}]]</td>
+									<td class="col-md-2">[[${product.category}]]</td>
+									<td class="col-md-1">[[${product.price}]]</td>
+									<td class="col-md-1">[[${product.discount}]]</td>
+									<td class="col-md-1">[[${product.discountPrice}]]</td>
+									<td class="col-md-1">[[${product.stock}]]</td>
+									<td><a th:href="@{'/admin/editProduct/' + ${product.id}}"
+										class="btn btn-primary btn-sm"><i
+											class="fa-solid fa-pen-to-square fa-1x"></i> Edit </a> <a
+										th:href="@{'/admin/deleteProduct/' + ${product.id}}"
+										class="btn btn-danger btn-sm"><i
+											class="fa-solid fa-trash text-dark fa-1x"></i> Delete </a></td>
+								</tr>
+
+							</tbody>
+						</table>
+						<!-- pagination -->
+						<div class="row">
+							<div class="col-md-4">Total Orders: [[${totalElements}]]</div>
+							<div class="col-md-6">
+								<th:block th:if="${productsSize > 0}">
+									<nav aria-label="Page navigation example">
+										<ul class="pagination">
+											<li class="page-item"><a class="page-link"
+												th:classappend="${isFirst}?'disabled':''"
+												th:href="@{'/admin/products?pageNo=' + ${pageNo-1}}"
+												aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
+											</a></li>
+											<li th:each="i:${#numbers.sequence(1,totalPages)}"
+												class="page-item"
+												th:classappend="${pageNo+1==i}?'active':''"><a
+												class="page-link"
+												th:href="@{'/admin/products?pageNo=' + ${i-1}}">[[${i}]]</a></li>
+
+											<li class="page-item"><a class="page-link"
+												th:classappend="${isLast}?'disabled':''"
+												th:href="@{'/admin/products?pageNo=' + ${pageNo+1}}"
+												aria-label="Next"> <span aria-hidden="true">&raquo;</span>
+											</a></li>
+										</ul>
+									</nav>
+								</th:block>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</section>
+
+</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base :: layout(~{::section})}">
+<head>
+<meta charset="UTF-8">
+<title>Login - SCM Store</title>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+	
+	 <script defer>
+        function togglePaymentFields() {
+            const paymentType = document.getElementById('paymentType').value;
+            const cardDetails = document.querySelector('.card-details');
+            const upiPayment = document.querySelector('.upi-payment');
+
+            // Hide both sections first
+            cardDetails.style.display = 'none';
+            upiPayment.style.display = 'none';
+
+            // Show the relevant fields based on the selected payment type
+            if (paymentType === 'Card') {
+                cardDetails.style.display = 'block';
+            } else if (paymentType === 'UPI') {
+                upiPayment.style.display = 'block';
+            }
+        }
+    </script>
+	
+</head>
+<body>
+
+	<section>
+        <div class="container mt-5">
+        <form action="/user/checkout" method="post" id="order" novalidate>
+            <div class="row">
+                <!-- Address Form Section -->
+                <div class="col-md-6">
+                    <div class="form-section">
+                        <p class="section-title">Fill Address</p>
+                        <div class="divider"></div>
+                            <div class="row mb-3">
+                                <div class="col p-1">
+                                    <label class="form-label">First Name <span style="color: red;">*</span></label>
+                                    <input class="form-control" name="firstName" type="text" placeholder="First Name" required>
+                                </div>
+                                <div class="col p-1">
+                                    <label class="form-label">Last Name <span style="color: red;">*</span></label>
+                                    <input class="form-control" name="lastName" type="text" placeholder="Last Name" required>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col p-1">
+                                    <label class="form-label">Email <span style="color: red;">*</span></label>
+                                    <input class="form-control" name="email" type="email" placeholder="Email" required>
+                                </div>
+                                <div class="col p-1">
+                                    <label class="form-label">Mobile Number <span style="color: red;">*</span></label>
+                                    <input class="form-control" name="mobileNumber" type="text" placeholder="Mobile Number" required>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col p-1">
+                                    <label class="form-label">Address <span style="color: red;">*</span></label>
+                                    <input class="form-control" name="address" type="text" placeholder="Address" required>
+                                </div>
+                                <div class="col p-1">
+                                    <label class="form-label">City <span style="color: red;">*</span></label>
+                                    <input class="form-control" name="city" type="text" placeholder="City" required>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col p-1">
+                                    <label class="form-label">State <span style="color: red;">*</span></label>
+                                    <input class="form-control" name="state" type="text" placeholder="State" required>
+                                </div>
+                                <div class="col p-1">
+                                    <label class="form-label">Pin Code <span style="color: red;">*</span></label>
+                                    <input class="form-control" name="pincode" type="number" placeholder="Pin Code" required>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+
+                <!-- Price and Payment Section -->
+                <div class="col-md-6">
+                    <p class="section-title">Price Details</p>
+                    <div class="divider"></div>
+
+                    <div class="card-sh price-details">
+                        <div class="details-section">
+                            <div class="price-row">
+                                <div class="label">Price ([[${cardItemsCount}]] items)</div>
+                                <div class="value">₹ [[${OrderSummary.totalPrice}]]</div>
+                            </div>
+                            <div class="price-row">
+                                <div class="label">Discount</div>
+                                <div class="value discount">− ₹ [[${OrderSummary.discount}]]</div>
+                            </div>
+                            <div class="price-row">
+                                <div class="label">Platform Fee</div>
+                                <div class="value">₹ [[${OrderSummary.platformFee}]]</div>
+                            </div>
+                            <div class="price-row">
+                                <div class="label">Delivery Charges</div>
+                                <div class="value">
+                                <th:block th:if="${OrderSummary.deliveryCharges > 0}">
+                                	<div class="value">₹ [[${OrderSummary.deliveryCharges}]]</div>
+                                </th:block>
+                                <th:block th:unless="${OrderSummary.deliveryCharges > 0}">
+                                	<span class="free-label">Free</span>
+                                </th:block>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="total-section">
+                            <div class="total-label">Total Amount</div>
+                            <div class="total-amount">₹ [[${OrderSummary.finalAmount}]]</div>
+                        </div>
+                        <div class="savings-message">You will save ₹ [[${#numbers.formatDecimal(OrderSummary.totalPrice - OrderSummary.finalAmount, 2, 2)}]] on this order</div>
+                    </div>
+
+                    <p class="section-title">Payment Type</p>
+                    <div class="divider"></div>
+
+                    <div class="payment-card">
+                            <div class="mb-3">
+                                <label class="form-label">Select Payment Type</label>
+                                <select class="form-control" name="paymentType" id="paymentType" onchange="togglePaymentFields()" required>
+                                    <option value="" selected disabled>--Select--</option>
+                                    <option value="COD">Cash On Delivery</option>
+                                    <option value="Card">Card Payment</option>
+                                    <option value="UPI">UPI Payment</option>
+                                </select>
+                            </div>
+
+                             <!-- Card Payment Section -->
+                            <div class="card-details">
+                                <div class="mb-3">
+                                    <label class="form-label">Card Holder Name</label>
+                                    <input class="form-control" name="cardHolderName" type="text" placeholder="Card Holder Name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Card Number</label>
+                                    <input class="form-control" name="cardNumber" type="text" placeholder="Card Number" required>
+                                </div>
+                                <div class="mb-3 row">
+                                    <div class="col">
+                                        <label class="form-label">Expiry Date</label>
+                                        <input class="form-control" name="expiryDate" type="text" placeholder="MM/YY" required>
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label">CVV</label>
+                                        <input class="form-control" name="cvv" type="password" placeholder="CVV" required>
+                                    </div>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="saveCard" name="saveCardFlag">
+                                    <label class="form-check-label" for="saveCard">Save Card for future use</label>
+                                </div>
+                            </div>
+
+                            <!-- UPI Payment Section -->
+                            <div class="upi-payment">
+                                <p class="section-title">Scan QR Code to Pay</p>
+								<label for="upiId">Enter UPI ID:</label> <input type="text"
+									id="upiId" name="upiId" required>
+								<div class="qr-code">
+                                    <img src="/img/profile_img/qr_code.jpeg" alt="QR Code for UPI Payment">
+                                </div>
+                            </div>
+
+                            <button class="btn btn-success place-order-btn mt-4" type="submit">Place Order</button>
+
+                    </div>
+                </div>
+            </div>
+            </form>
+        </div>
+        <script>
+    function togglePaymentFields() {
+        const paymentType = document.getElementById('paymentType').value;
+        const cardDetails = document.querySelector('.card-details');
+        const upiPayment = document.querySelector('.upi-payment');
+
+        const cardFields = document.querySelectorAll('.card-details input');
+        const upiFields = document.querySelectorAll('.upi-payment input');
+
+        // Hide both sections first and remove 'required' from hidden inputs
+        cardDetails.style.display = 'none';
+        upiPayment.style.display = 'none';
+        cardFields.forEach(field => field.removeAttribute('required'));
+        upiFields.forEach(field => field.removeAttribute('required'));
+
+        // Show the relevant fields based on the selected payment type
+        if (paymentType === 'Card') {
+            cardDetails.style.display = 'block';
+            cardFields.forEach(field => field.setAttribute('required', 'required'));  // Add 'required' to card fields
+        } else if (paymentType === 'UPI') {
+            upiPayment.style.display = 'block';
+            upiFields.forEach(field => field.setAttribute('required', 'required'));  // Add 'required' to UPI fields
+        }
+    }
+</script>
+    </section>
+
+    
+
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

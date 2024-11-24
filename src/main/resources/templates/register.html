@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" 
+	th:replace="~{base :: layout(~{::section})}">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+	<section>
+		<div class="container mt-5 p-5">
+            <div class="row justify-content-center align-items-center">
+                <div class="col-md-6 d-flex justify-content-center">
+                    <img alt="Login Logo" src="img/profile_img/Login Logo.png" width="50%" height="auto">
+                </div>
+                <div class="col-md-6">
+                    <div class="card shadow">
+						<div class="card-header text-center bg-primary text-white">
+							<p class="fs-4 mb-0">Register</p>
+							<th:block th:if="${session.successMsg}">
+								<p class="fw-bold" style="color: #33fa3b">[[${session.successMsg}]]</p>
+								<th:block th:text="${@commanServiceImpl.removeSessionMsg}"></th:block>
+							</th:block>
+							<th:block th:if="${session.errorMsg}">
+								<p class="fw-bold" style="color: #fa3333">[[${session.errorMsg}]]</p>
+								<th:block th:text="${@commanServiceImpl.removeSessionMsg}"></th:block>
+							</th:block>
+						</div>
+						<div class="card-body p-4">
+                            <form action="/saveUser" enctype="multipart/form-data" method="post" id="userRegister" novalidate>
+	                            <div class="row justify-content-center align-items-center">
+	                           		<div class="col mb-3">
+	                                    <label class="form-label">Name</label>
+	                                    <input class="form-control" name="name" type="text" placeholder="Enter your Name" required>
+	                                </div>
+	                                <div class="col mb-3">
+	                                    <label class="form-label">Mobile Number</label>
+	                                    <input class="form-control" name="mobileNumber" type="text" placeholder="Enter Mobile Number" required>
+	                                </div>
+	                            </div>
+	                             <div class="mb-3">
+	                                 <label class="form-label">Email</label>
+	                                 <input class="form-control" name="email" type="email" placeholder="Enter your email" required>
+	                             </div>
+                                <div class="row justify-content-center align-items-center">
+	                           		<div class="col mb-3">
+	                                    <label class="form-label">Address</label>
+	                                    <input class="form-control" name="address" type="text" placeholder="Enter Address" required>
+	                                </div>
+	                                <div class="col mb-3">
+	                                    <label class="form-label">City</label>
+	                                    <input class="form-control" name="city" type="text" placeholder="Enter City Name" required>
+	                                </div>
+                            	</div>
+                            	<div class="row justify-content-center align-items-center">
+	                           		<div class="col mb-3">
+	                                    <label class="form-label">State</label>
+	                                    <input class="form-control" name="state" type="text" placeholder="Enter State Name" required>
+	                                </div>
+	                                <div class="col mb-3">
+	                                    <label class="form-label">Pin Code</label>
+	                                    <input class="form-control" name="pincode" type="number" placeholder="Enter Pin Code" required>
+	                                </div>
+                            	</div>
+                            	<div class="row justify-content-center align-items-center">
+	                           		<div class="col mb-3">
+	                                    <label class="form-label">Password</label>
+	                                    <input class="form-control" name="password" type="password" placeholder="Enter password" id="password" required>
+	                                </div>
+	                                <div class="col mb-3">
+	                                    <label class="form-label">Confirm Password</label>
+	                                    <input class="form-control" name="confirmpassword" type="password" placeholder="Enter Re-Enter Password" required>
+	                                </div>
+                            	</div>
+                            	<div class="col mb-3">
+                                    <label class="form-label">Profile Image</label>
+                                    <input class="form-control" name="img" type="file" placeholder="Upload Your image">
+                                </div>
+                                
+                            	<button class="btn btn-primary text-white w-100" type="submit">Register</button>
+                            </form>
+                        </div>
+                        <div class="card-footer text-center">
+                            Have an account?
+                            <a href="/signin" class="text-decoration-none">Login →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+	</section>
+	
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

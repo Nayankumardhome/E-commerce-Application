@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base :: layout(~{::section})}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Insert title here</title>
+
+</head>
+<body>
+
+	<section>
+		<div class="container mt-5">
+    <div class="card shadow-lg border-0 rounded-3" style="max-width: 550px; margin: auto;">
+        <!-- Single form with dynamic action URL -->
+        <form th:action="@{${actionType == 'replace' ? '/user/replaceOrderProducts' : '/user/submitOrderStatusUpdate'}}" method="post" id="replaceReason" novalidate>
+    <input type="hidden" name="orderId" th:value="${orderId}" />
+    <input type="hidden" name="actionType" th:value="${actionType}" />
+
+    <!-- Card Header with dynamic title -->
+    <div class="card-header bg-primary text-white text-center">
+        <h4 th:text="'Reason for ' + ${actionType} + ' the order'"></h4>
+    </div>
+
+    <!-- Card Body with form content -->
+    <div class="card-body p-4">
+        <!-- Choose a reason (radio buttons) -->
+        <div class="mb-3">
+            <h5 class="mb-3">Choose a reason:</h5>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="reason" value="Damaged Product" id="damagedProduct" required>
+                <label class="form-check-label" for="damagedProduct">Damaged Product</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="reason" value="Wrong Product Delivered" id="wrongProduct">
+                <label class="form-check-label" for="wrongProduct">Wrong Product Delivered</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="reason" value="Not Satisfied with Product" id="notSatisfied">
+                <label class="form-check-label" for="notSatisfied">Not Satisfied with Product</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="reason" value="Better Price Found" id="betterPrice">
+                <label class="form-check-label" for="betterPrice">Better Price Found</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="reason" value="Other" id="otherReason">
+                <label class="form-check-label" for="otherReason">Other</label>
+            </div>
+            <div class="invalid-feedback">Please select a reason for your action.</div>
+        </div>
+
+        <!-- Textarea for additional explanation -->
+        <div class="mb-3">
+            <label for="detailedReason" class="form-label fw-bold">Explain in detail (optional):</label>
+            <textarea id="detailedReason" name="detailedReason" class="form-control" rows="3" placeholder="Please provide any additional details here..."></textarea>
+        </div>
+
+        <!-- Submit button with dynamic text based on actionType -->
+        <div class="text-center">
+            <button type="submit" class="btn btn-warning btn-lg px-5 py-2" th:text="${actionType == 'replace' ? 'Replace' : 'Submit'}"></button>
+        </div>
+    </div>
+</form>
+    </div>
+</div>
+
+<script>
+    document.getElementById('replaceReason').addEventListener('submit', function(event) {
+        const reasonInputs = document.querySelectorAll('input[name="reason"]');
+        let reasonSelected = false;
+        reasonInputs.forEach(input => {
+            if (input.checked) {
+                reasonSelected = true;
+            }
+        });
+
+        if (!reasonSelected) {
+            event.preventDefault();
+            alert("Please select a reason for why replace.");
+        }
+    });
+</script>
+
+
+	</section>
+
+</body>
+</html>

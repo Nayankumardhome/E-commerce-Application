@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+	th:replace="~{base :: layout(~{::section})}">
+<head>
+<meta charset="UTF-8">
+<title>Cart</title>
+</head>
+<body>
+
+	<section>
+		<div class="container-fluid bg-white p-5 mt-3">
+			<div th:if="${carts.isEmpty()}"
+				style="text-align: center; padding: 50px;">
+				<img th:src="@{/img/EmptyCart.jpg}" width="200px" height="160px"
+					alt="Empty Cart Image">
+				<div class="blockquote" style="margin-top: 20px;">Your cart is
+					empty!</div>
+				<div>Explore our wide selection and find something you like.</div>
+			</div>
+
+			<div th:if="${!carts.isEmpty()}">
+				<div class="row">
+					<div class="col-md-8">
+						<!-- Adjusted width for the cart card -->
+						<div class="card card-sh">
+							<div class="card-header text-center">
+								<p class="fs-4">Cart</p>
+								<th:block th:if="${session.successMsg}">
+									<p class="text-success fw-bold">[[${session.successMsg}]]</p>
+									<th:block th:text="${@commanServiceImpl.removeSessionMsg}"></th:block>
+								</th:block>
+								<th:block th:if="${session.errorMsg}">
+									<p class="text-danger fw-bold">[[${session.errorMsg}]]</p>
+									<th:block th:text="${@commanServiceImpl.removeSessionMsg}"></th:block>
+								</th:block>
+							</div>
+							<div class="card-body">
+								<table class="table">
+									<thead>
+										<tr class="text-center">
+											<th scope="col">S.No</th>
+											<th scope="col">Image</th>
+											<th scope="col">Product Name</th>
+											<th scope="col">Price</th>
+											<th scope="col">Quantity</th>
+											<th scope="col">Total Price</th>
+											<!-- <th scope="col">Action</th> -->
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="text-center" th:each="cart,c:${carts}">
+											<th scope="row">[[${c.count}]]</th>
+											<td><img
+												th:src="@{'/img/product_img/'+${cart.product.image}}"
+												width="100px" height="90px"
+												onerror="this.src='/img/product_img/default.png'"></td>
+											<td>[[${cart.product.productName}]]</td>
+											<td>[[${cart.product.discountPrice}]]</td>
+											<td class="text-center"><a
+												th:href="@{'/user/cartQuantityUpdate?symbol=minus&cid='+${cart.id}}"
+												class="text-decoration-none" aria-label="Decrease quantity">
+													<i class="fa-solid fa-minus"></i>
+											</a> [[${cart.quantity}]] <a
+												th:href="@{'/user/cartQuantityUpdate?symbol=plus&cid='+${cart.id}}"
+												class="text-decoration-none" aria-label="Increase quantity">
+													<i class="fa-solid fa-plus"></i>
+											</a></td>
+											<td>[[${cart.totalPrice}]]</td>
+											<td><!-- <a
+												th:href="@{'/admin/editProduct/' + ${cart.product.id}}"
+												class="btn btn-primary btn-sm" aria-label="Edit product">
+													<i class="fa-solid fa-pen-to-square fa-1x"></i> Edit
+											</a> --> <!-- <a th:href="@{'/user/removeProduct/' + ${cart.product.id}}"
+												class="btn btn-danger btn-sm" aria-label="Delete product">
+													<i class="fa-solid fa-trash text-dark fa-1x"></i> Delete
+											</a> --></td>
+										</tr>
+									</tbody>
+								</table>
+								<div class="col-12">
+									<div class="d-flex justify-content-end mt-4">
+										<a href="/user/orders" class="btn btn-warning btn-sm"
+											style="background-color: rgb(253, 104, 4); border-color: rgb(253, 104, 4); color: white; padding: 10px 20px; font-size: 16px; text-decoration: none;">
+											<span style="text-transform: uppercase; font-weight: bold;">Place
+												Order</span>
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-md-4">
+						<!-- Adjusted width for the payment card -->
+						<div class="card card-sh" style="position: sticky; top: 100px;">
+							<div class="price-details">
+								<span class="title">Price Details</span>
+								<div class="details-section">
+									<div class="price-row">
+										<div class="label">Price ([[${cardItemsCount}]] items)</div>
+										<div class="value">₹ [[${OrderSummary.totalPrice}]]</div>
+									</div>
+									<div class="price-row">
+										<div class="label">Discount</div>
+										<div class="value discount">− ₹
+											[[${#numbers.formatDecimal(OrderSummary.discount,2,2)}]]</div>
+									</div>
+									<div class="price-row">
+										<div class="label">Platform Fee</div>
+										<div class="value">₹ [[${OrderSummary.platformFee}]]</div>
+									</div>
+									<div class="price-row">
+										<div class="label">Delivery Charges</div>
+										<div class="value">
+											<th:block th:if="${OrderSummary.deliveryCharges > 0}">
+												<div class="value">₹
+													[[${OrderSummary.deliveryCharges}]]</div>
+											</th:block>
+											<th:block th:unless="${OrderSummary.deliveryCharges > 0}">
+												<span class="free-label">Free</span>
+											</th:block>
+										</div>
+									</div>
+								</div>
+								<div class="total-section">
+									<div class="total-label">Total Amount</div>
+									<div class="total-amount">₹
+										[[${OrderSummary.finalAmount}]]</div>
+								</div>
+								<div class="savings-message">You will save ₹
+									[[${#numbers.formatDecimal(OrderSummary.totalPrice - OrderSummary.finalAmount, 2, 2)}]] on
+									this order</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+</body>
+</html>
