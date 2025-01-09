@@ -28,3 +28,5 @@ This is a full-fledged e-commerce web application built using Spring Boot, Thyme
 1. Clone the repository:
    ```bash
    git clone https://github.com/Nayankumardhome/E-commerce-Application.git
+2. Open the project in your favorite IDE (e.g., IntelliJ IDEA or Eclipse).
+3. Build and run the application.
