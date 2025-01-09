@@ -29,4 +29,18 @@ This is a full-fledged e-commerce web application built using Spring Boot, Thyme
    ```bash
    git clone https://github.com/Nayankumardhome/E-commerce-Application.git
 2. Open the project in your favorite IDE (e.g., IntelliJ IDEA or Eclipse).
-3. Build and run the application.
+3. Configure the database connection in application.properties:
+```properties:
+  spring.datasource.url=jdbc:mysql://localhost:3306/ecommerce_db
+  spring.datasource.username=your_username
+  spring.datasource.password=your_password
+
+  spring.mail.username=your_username
+  spring.mail.password=your_password_token
+```
+4. Build and run the application
+  ```bash
+  mvn clean install
+  mvn spring-boot:run
+```
+5. Access the application in your browser at http://localhost:8080.
